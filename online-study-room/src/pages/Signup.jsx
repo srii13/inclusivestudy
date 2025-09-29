@@ -11,35 +11,69 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setError("");
-    console.log("Sending:", { username, password, displayName });
-
     try {
       const res = await axios.post("http://localhost:3001/signup", {
         username,
-        password,
         displayName,
+        password,
       });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("username", res.data.username);
-      localStorage.setItem("displayName", res.data.displayName);
-      navigate("/dashboard");
+
+      if (res.data.success) {
+        alert("Signup successful! Please log in.");
+        navigate("/login");
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
     }
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "400px" }}>
-      <h2 className="mb-4 text-center">Signup</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleSignup}>
-        <input className="form-control mb-2" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        <input className="form-control mb-2" placeholder="Display Name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
-        <input className="form-control mb-2" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button className="btn btn-success w-100">Signup</button>
-      </form>
-      <p className="mt-3 text-center">Already have an account? <Link to="/login">Login</Link></p>
+    <div className="d-flex vh-100 justify-content-center align-items-center bg-light">
+      <div className="card p-4 shadow" style={{ width: "400px" }}>
+        <h3 className="mb-3">Create Account</h3>
+        {error && <div className="alert alert-danger">{error}</div>}
+        <form onSubmit={handleSignup}>
+          <div className="mb-3">
+            <label className="form-label">Username</label>
+            <input
+              type="text"
+              className="form-control"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Display Name</label>
+            <input
+              type="text"
+              className="form-control"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button className="btn btn-primary w-100" type="submit">
+            Sign Up
+          </button>
+        </form>
+        <p className="mt-3 text-muted">
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
     </div>
   );
 };

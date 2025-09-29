@@ -1,19 +1,23 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
-import "@excalidraw/excalidraw/index.css";
 import { io } from "socket.io-client";
+import "@excalidraw/excalidraw/index.css";
+
+
 
 const socket = io("http://localhost:3001");
 
-const Whiteboard = ({ roomId, onClose }) => {
+const Whiteboard = ({ visible, onClose, roomId }) => {
   const excalidrawRef = useRef(null);
 
-  // 🔄 Receive updates
+  // ✅ Sync updates
   useEffect(() => {
-    socket.on("whiteboard-update", ({ roomId: incomingRoomId, data }) => {
-      if (incomingRoomId === roomId && excalidrawRef.current) {
-        console.log("📥 Received whiteboard update:", data.length);
-        excalidrawRef.current.updateScene({ elements: data });
+    if (!roomId) return;
+
+    // Listen for updates
+    socket.on("whiteboard-update", (data) => {
+      if (excalidrawRef.current) {
+        excalidrawRef.current.updateScene(data);
       }
     });
 
@@ -22,38 +26,60 @@ const Whiteboard = ({ roomId, onClose }) => {
     };
   }, [roomId]);
 
-  // ✍️ Send updates when local user draws
-  const handleChange = (elements) => {
-    console.log("📤 Sending whiteboard update:", elements.length);
-    socket.emit("whiteboard-update", { roomId, data: elements });
+  // ✅ Send updates when drawing changes
+  const handleChange = (elements, appState) => {
+    if (roomId) {
+      socket.emit("whiteboard-update", { roomId, data: { elements, appState } });
+    }
   };
+
+  if (!visible) return null;
 
   return (
     <div
+      className="whiteboard-overlay"
       style={{
         position: "fixed",
-        top: "10%",
-        left: "10%",
-        width: "80%",
-        height: "80%",
-        background: "white",
-        border: "2px solid #333",
-        borderRadius: "10px",
-        zIndex: 9999,
-        boxShadow: "0px 4px 20px rgba(0,0,0,0.2)",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0,0,0,0.6)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 2000,
       }}
     >
-      <div style={{ textAlign: "right", padding: "5px" }}>
-        <button className="btn btn-danger btn-sm" onClick={onClose}>
-          Close ✕
+      <div
+        className="whiteboard-container"
+        style={{
+          width: "90%",
+          height: "90%",
+          background: "white",
+          borderRadius: "8px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 10,
+            zIndex: 2100,
+          }}
+          className="btn btn-danger"
+        >
+          ✖ Close
         </button>
+        <Excalidraw
+          ref={excalidrawRef}
+          onChange={handleChange}
+          initialData={{ elements: [], appState: { viewBackgroundColor: "#fff" } }}
+        />
       </div>
-
-      <Excalidraw
-        ref={excalidrawRef}
-        onChange={(elements) => handleChange(elements)}
-        initialData={{ elements: [], appState: { viewModeEnabled: false } }}
-      />
     </div>
   );
 };
