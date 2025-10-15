@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Add this to your global CSS file (e.g., src/index.css) */
+
+/* Initial state (visible) and end state (faded) are controlled by the component's state */
+
+.quote-box.fade-in {
+    opacity: 1;
+}
+
+.quote-box.fade-out {
+    opacity: 0.1; /* Almost invisible */
+}
+
+/* Ensure the transition property is also included in the inline style 
+   or the base class (it's already in the inline style above) */

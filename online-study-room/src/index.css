@@ -2,3 +2,39 @@ body {
   background: #f8f9fa; /* Bootstrap default bg */
   color: #212529;
 }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sliding Down Animation for Motivational Banner */
+.quote-banner {
+  transform: translateY(-100%);
+  opacity: 0;
+  animation: slideDown 1s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+/* Add this to your global CSS file (e.g., src/index.css) */
+
+/* Initial state (visible) and end state (faded) are controlled by the component's state */
+
+.quote-box.fade-in {
+    opacity: 1;
+}
+
+.quote-box.fade-out {
+    opacity: 0.1; /* Almost invisible */
+}
+
+/* Ensure the transition property is also included in the inline style 
+   or the base class (it's already in the inline style above) */
