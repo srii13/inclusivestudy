@@ -128,7 +128,7 @@ const PomodoroPage = ({ user }) => {
                         onChange={(e) => setStudyGoal(e.target.value)}
                         style={{ resize: 'none', borderColor: '#e9ecef' }}
                     />
-                    <small className="text-muted mt-2">Goal is saved locally across sessions.</small>
+                    <small className="text-muted mt-2"></small>
                 </div>
 
             </div>
