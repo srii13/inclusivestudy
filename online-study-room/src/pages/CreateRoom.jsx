@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import PremiumSelect from "../components/PremiumSelect";
 
 const API_URL = "http://localhost:3001";
 
@@ -104,27 +105,27 @@ const CreateRoom = ({ user }) => {
         <div>
             <Navbar user={user} setUser={() => {}} />
             <div className="container mt-5">
-                <h1 className="display-5 text-center mb-5 fw-bold text-dark">
-                    Join or Create a Study Session
+                <h1 className="display-4 text-center mb-5 fw-bolder text-white">
+                    Join or <span className="text-gradient">Create</span> a Session
                 </h1>
 
-                <div className="row justify-content-center mb-5">
+                <div className="row justify-content-center mb-5 g-4">
                     
                     {/* LEFT COLUMN: CREATE ROOM FORM */}
-                    <div className="col-md-5 mb-5 mb-md-0">
-                        <div className="card p-4 shadow-lg border-primary border-3 h-100">
-                            <h3 className="mb-4 text-primary">
-                                <i className="bi bi-plus-circle me-2"></i> Start a New Room
+                    <div className="col-md-5">
+                        <div className="glass-panel p-4 h-100">
+                            <h3 className="mb-4 text-white">
+                                <i className="bi bi-plus-circle me-2 text-gradient"></i> Start a New Room
                             </h3>
                             
                             {creationError && <div className="alert alert-danger">{creationError}</div>}
 
                             {/* Room Name Input */}
-                            <div className="mb-3">
-                                <label htmlFor="roomName" className="form-label fw-bold">Room Name</label>
+                            <div className="mb-4">
+                                <label htmlFor="roomName" className="form-label text-secondary fw-semibold">Room Name</label>
                                 <input
                                     type="text"
-                                    className="form-control"
+                                    className="form-control premium-input"
                                     id="roomName"
                                     value={roomName}
                                     onChange={(e) => setRoomName(e.target.value)}
@@ -134,89 +135,87 @@ const CreateRoom = ({ user }) => {
                             </div>
                             
                             {/* Subject/Topic Selector */}
-                            <div className="mb-3">
-                                <label htmlFor="subject" className="form-label fw-bold">Subject/Topic</label>
-                                <select
-                                    className="form-select"
-                                    id="subject"
+                            <div className="mb-4">
+                                <label className="form-label text-secondary fw-semibold">Subject/Topic</label>
+                                <PremiumSelect 
+                                    options={[
+                                        { value: "General Study", label: "General Study" },
+                                        { value: "Math", label: "Math / Physics" },
+                                        { value: "Code", label: "Coding / Tech" },
+                                        { value: "History", label: "History / Humanities" }
+                                    ]}
                                     value={subject}
-                                    onChange={(e) => setSubject(e.target.value)}
-                                >
-                                    <option value="General Study">General Study</option>
-                                    <option value="Math">Math / Physics</option>
-                                    <option value="Code">Coding / Tech</option>
-                                    <option value="History">History / Humanities</option>
-                                </select>
+                                    onChange={setSubject}
+                                />
                             </div>
 
                             {/* NEW: Public/Invite Selector */}
                             <div className="mb-4">
-                                <label className="form-label fw-bold d-block">Access Type</label>
-                                <div className="btn-group w-100" role="group">
-                                    <input 
-                                        type="radio" 
-                                        className="btn-check" 
-                                        name="access" 
-                                        id="publicAccess" 
-                                        autoComplete="off" 
-                                        checked={isPublic} 
-                                        onChange={() => setIsPublic(true)} 
-                                    />
-                                    <label className="btn btn-outline-success" htmlFor="publicAccess">
+                                <label className="form-label text-secondary fw-semibold d-block">Access Type</label>
+                                <div className="glass-panel d-inline-flex p-1 rounded-pill w-100 shadow-sm" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <button 
+                                        type="button"
+                                        className={`btn btn-sm rounded-pill flex-grow-1 py-2 border-0 transition-all ${isPublic ? 'text-white shadow' : 'text-secondary'}`}
+                                        style={{ 
+                                            background: isPublic ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+                                            fontWeight: isPublic ? 'bold' : 'normal'
+                                        }}
+                                        onClick={() => setIsPublic(true)}
+                                    >
                                         <i className="bi bi-globe me-1"></i> Public
-                                    </label>
-
-                                    <input 
-                                        type="radio" 
-                                        className="btn-check" 
-                                        name="access" 
-                                        id="privateAccess" 
-                                        autoComplete="off" 
-                                        checked={!isPublic} 
-                                        onChange={() => setIsPublic(false)} 
-                                    />
-                                    <label className="btn btn-outline-danger" htmlFor="privateAccess">
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        className={`btn btn-sm rounded-pill flex-grow-1 py-2 border-0 transition-all ${!isPublic ? 'text-white shadow' : 'text-secondary'}`}
+                                        style={{ 
+                                            background: !isPublic ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'transparent',
+                                            fontWeight: !isPublic ? 'bold' : 'normal'
+                                        }}
+                                        onClick={() => setIsPublic(false)}
+                                    >
                                         <i className="bi bi-lock me-1"></i> Invite Only
-                                    </label>
+                                    </button>
                                 </div>
-                                <small className="text-muted d-block mt-1">
+                                <small className="text-secondary d-block mt-2">
                                     {isPublic ? 'Public rooms appear on the list.' : 'Invite-only rooms are hidden from the list.'}
                                 </small>
                             </div>
                             {/* END NEW SELECTOR */}
 
-                            <button className="btn btn-primary btn-lg w-100" onClick={createRoom}>
-                                <i className="bi bi-rocket-takeoff me-2"></i> Create & Join Now
+                            <button className="btn-premium w-100 mt-2" onClick={createRoom}>
+                                Create & Join Now <i className="bi bi-rocket-takeoff ms-2"></i>
                             </button>
                         </div>
                     </div>
 
                     {/* RIGHT COLUMN: EXISTING ROOMS LIST WITH SEARCH/FILTER */}
                     <div className="col-md-7">
-                        <div className="card p-4 shadow-lg border-secondary border-3 h-100">
-                            <h3 className="mb-4 text-secondary">
-                                <i className="bi bi-list-ul me-2"></i> Public Sessions
+                        <div className="glass-panel p-4 h-100">
+                            <h3 className="mb-4 text-white">
+                                <i className="bi bi-list-ul me-2 text-gradient"></i> Public Sessions
                             </h3>
                             
                             {/* SEARCH AND FILTER TAB */}
                             <div className="d-flex mb-4 gap-2">
                                 <input
                                     type="text"
-                                    className="form-control"
+                                    className="form-control premium-input"
                                     placeholder="Search by Room Name or Host..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
-                                <select
-                                    className="form-select"
+                                <PremiumSelect
                                     style={{ width: '150px' }}
+                                    options={[
+                                        { value: "All", label: "All" },
+                                        { value: "General Study", label: "General Study" },
+                                        { value: "Math", label: "Math / Physics" },
+                                        { value: "Code", label: "Coding / Tech" },
+                                        { value: "History", label: "History / Humanities" }
+                                    ]}
                                     value={filterSubject}
-                                    onChange={(e) => setFilterSubject(e.target.value)}
-                                >
-                                    {availableSubjects.map(sub => (
-                                        <option key={sub} value={sub}>{sub}</option>
-                                    ))}
-                                </select>
+                                    onChange={setFilterSubject}
+                                />
                             </div>
                             {/* END SEARCH AND FILTER TAB */}
 
@@ -236,24 +235,24 @@ const CreateRoom = ({ user }) => {
                             )}
 
                             {/* ROOM LIST */}
-                            <div className="list-group">
+                            <div className="d-flex flex-column gap-3">
                                 {filteredRooms.map((room) => (
                                     <div 
                                         key={room.roomId} 
-                                        className="list-group-item list-group-item-action d-flex justify-content-between align-items-center mb-2 shadow-sm"
-                                        style={{ borderLeft: room.isPublic ? '4px solid var(--bs-success)' : '4px solid var(--bs-danger)' }}
+                                        className="glass-panel glass-panel-hover p-3 text-white d-flex justify-content-between align-items-center"
+                                        style={{ borderLeft: room.isPublic ? '4px solid #34d399' : '4px solid #f87171' }}
                                     >
                                         <div>
-                                            <h6 className="mb-1 fw-bold">{room.name}</h6>
-                                            <span className="badge bg-secondary me-2">{room.subject}</span>
-                                            <small className="text-muted">Host: {room.host}</small>
+                                            <h6 className="mb-2 fw-bold text-white">{room.name}</h6>
+                                            <span className="room-badge me-2">{room.subject}</span>
+                                            <small className="text-secondary">Host: {room.host}</small>
                                         </div>
                                         <div className="text-end">
                                             <small className="d-block text-success fw-bold">
                                                 {room.participantCount} Active
                                             </small>
                                             <button 
-                                                className="btn btn-sm btn-success mt-1"
+                                                className="btn btn-sm btn-outline-light mt-2"
                                                 onClick={() => handleJoin(room.roomId)}
                                             >
                                                 Join <i className="bi bi-arrow-right-short"></i>

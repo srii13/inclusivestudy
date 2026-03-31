@@ -1,7 +1,8 @@
-// src/pages/Profile.jsx - FINAL CORRECTED CODE
+// src/pages/Profile.jsx - IMPROVED WITH BETTER ERROR HANDLING
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import { handleError } from "../utils/errorHandler";
 
 const API_URL = "http://localhost:3001";
 
@@ -13,7 +14,9 @@ const Profile = ({ user, setUser }) => {
     const [displayName, setDisplayName] = useState(initialDisplayName);
     const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
     const [status, setStatus] = useState("");
+    const [statusType, setStatusType] = useState(""); // "success", "error", "info"
     const [file, setFile] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const token = localStorage.getItem("token");
 
     // Axios instance with auth header
@@ -24,117 +27,163 @@ const Profile = ({ user, setUser }) => {
         },
     });
     
-    // Function to update the display name and interests
+    // Function to update the display name
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
-        setStatus("Updating...");
+        setIsLoading(true);
+        setStatus("");
+        
         try {
+            if (!displayName.trim()) {
+                throw new Error("Display name cannot be empty");
+            }
+            
             const res = await axiosInstance.post("/update-profile", {
-                displayName: displayName,
-                // Add logic for updating interests if you implement an input for them
+                displayName: displayName.trim(),
+                avatar: avatarUrl
             });
 
             if (res.data.success) {
                 // Update local storage and global state
                 localStorage.setItem("displayName", res.data.displayName);
-                setUser((prevUser) => ({ ...prevUser, displayName: res.data.displayName }));
+                localStorage.setItem("avatar", res.data.avatar || avatarUrl);
+                setUser((prevUser) => ({ ...prevUser, displayName: res.data.displayName, avatar: res.data.avatar || avatarUrl }));
+                setStatusType("success");
                 setStatus("Profile updated successfully! ✅");
             } else {
-                setStatus(res.data.error || "Update failed.");
+                throw new Error(res.data.error || "Update failed");
             }
         } catch (err) {
-            setStatus("Update failed. Check server connection.");
-            console.error(err);
+            const errorMsg = handleError(err);
+            setStatusType("error");
+            setStatus(errorMsg);
+            console.error("Profile update error:", err);
+        } finally {
+            setIsLoading(false);
+            setTimeout(() => setStatus(""), 4000);
         }
-        setTimeout(() => setStatus(""), 3000);
     };
 
     // Function to handle avatar upload
     const handleAvatarUpload = async () => {
         if (!file) return;
 
-        setStatus("Uploading avatar...");
+        setIsLoading(true);
+        setStatus("");
         const formData = new FormData();
         formData.append("file", file);
         
-        // NOTE: We're temporarily using the /upload/:roomId endpoint, 
-        // but passing a placeholder 'profile' as the roomId. 
-        // The backend should ideally have a dedicated /upload-avatar route.
         try {
-            // Your existing backend route handles 'upload', so we adapt:
-            const res = await axiosInstance.post("/upload/profile", formData, {
+            // Validate file size
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                throw new Error("Avatar file must be less than 5MB");
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                throw new Error("File must be an image (JPG, PNG, GIF, or WebP)");
+            }
+
+            setStatusType("info");
+            setStatus("Uploading avatar...");
+
+            const res = await axiosInstance.post("/upload-avatar", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
             if (res.data.success) {
-                // Assuming the backend returns the public URL or file path
-                const newAvatarPath = `${API_URL}/uploads/${res.data.file.filename}`;
-                setAvatarUrl(newAvatarPath);
-                localStorage.setItem("avatar", newAvatarPath);
-                // Also update the backend's user model with the new avatar path
-                await axiosInstance.post("/update-profile", { avatar: newAvatarPath }); 
+                const newAvatarUrl = `${API_URL}${res.data.avatar}`;
+                setAvatarUrl(newAvatarUrl);
+                localStorage.setItem("avatar", newAvatarUrl);
+                setStatusType("success");
                 setStatus("Avatar updated! 🎉");
             } else {
-                setStatus(res.data.error || "Avatar upload failed.");
+                throw new Error(res.data.error || "Avatar upload failed");
             }
         } catch (err) {
-            setStatus("Avatar upload failed. Server error.");
-            console.error(err);
+            const errorMsg = handleError(err);
+            setStatusType("error");
+            setStatus(errorMsg);
+            console.error("Avatar upload error:", err);
+        } finally {
+            setFile(null);
+            setIsLoading(false);
+            setTimeout(() => setStatus(""), 4000);
         }
-        setFile(null); // Clear file input
-        setTimeout(() => setStatus(""), 3000);
     };
+
+    const presetAvatars = [
+        "https://api.dicebear.com/9.x/micah/svg?seed=Jasper&backgroundColor=b6e3f4",
+        "https://api.dicebear.com/9.x/micah/svg?seed=Felix&backgroundColor=c0aede",
+        "https://api.dicebear.com/9.x/micah/svg?seed=Aneka&backgroundColor=ffdfbf",
+        "https://api.dicebear.com/9.x/micah/svg?seed=Leo&backgroundColor=d1d4f9",
+        "https://api.dicebear.com/9.x/micah/svg?seed=Ryan&backgroundColor=ffd5dc"
+    ];
 
     return (
         <div>
             <Navbar user={user} setUser={setUser} />
-            <div className="container mt-5" style={{ maxWidth: '600px' }}>
-                <h2 className="mb-4 text-center">👤 Your Profile</h2>
+            <div className="container mt-5 mb-5" style={{ maxWidth: '650px' }}>
+                <div className="d-flex align-items-center justify-content-center mb-4">
+                    <i className="bi bi-person-badge fs-2 me-3 text-gradient"></i>
+                    <h2 className="mb-0 text-white fw-bolder">Your Profile</h2>
+                </div>
                 
-                {status && <div className={`alert ${status.includes('success') || status.includes('🎉') ? 'alert-success' : 'alert-danger'}`}>{status}</div>}
+                {status && (
+                    <div className={`alert alert-${statusType === 'success' ? 'success' : statusType === 'error' ? 'danger' : 'info'} bg-opacity-25 border-opacity-50 text-white alert-dismissible fade show`} role="alert">
+                        {status}
+                        <button type="button" className="btn-close btn-close-white" onClick={() => setStatus("")}></button>
+                    </div>
+                )}
 
                 {/* Avatar Section */}
-                <div className="card p-4 mb-4 text-center shadow-sm">
-                    <img 
-                        src={avatarUrl || 'https://via.placeholder.com/100?text=A'} 
-                        alt="User Avatar" 
-                        className="rounded-circle mx-auto mb-3" 
-                        style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
-                    />
-                    <h5 className="mb-3">{displayName}</h5>
+                <div className="glass-panel p-5 mb-4 text-center">
+                    <div className="position-relative d-inline-block mb-4">
+                        <img 
+                            src={avatarUrl || 'https://via.placeholder.com/120?text=A'} 
+                            alt="User Avatar" 
+                            className="rounded-circle shadow-lg border border-3 border-secondary border-opacity-50" 
+                            style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
+                        />
+                    </div>
+                    <h4 className="mb-4 text-white fw-bold"><span className="text-secondary fw-normal fs-5 me-2">Welcome back,</span>{displayName}</h4>
 
-                    <input 
-                        type="file" 
-                        className="form-control mb-2" 
-                        onChange={(e) => setFile(e.target.files[0])} 
-                    />
-                    <button 
-                        className="btn btn-sm btn-outline-primary" 
-                        onClick={handleAvatarUpload} 
-                        disabled={!file}
-                    >
-                        {file ? `Upload ${file.name}` : 'Select Image'}
-                    </button>
+                    <div className="mt-2 text-center">
+                        <p className="text-secondary small fw-bold mb-3">CHOOSE AN AVATAR</p>
+                        <div className="d-flex justify-content-center gap-3 flex-wrap">
+                            {presetAvatars.map((url, idx) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt="Preset Avatar"
+                                    className={`rounded-circle cursor-pointer transition-all border ${avatarUrl === url ? 'border-primary border-3 shadow-lg' : 'border-secondary border-opacity-50 glass-panel-hover'}`}
+                                    style={{ width: '60px', height: '60px', objectFit: 'cover', cursor: 'pointer', transform: avatarUrl === url ? 'scale(1.1)' : 'scale(1)' }}
+                                    onClick={() => setAvatarUrl(url)}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Details Update Form */}
-                <div className="card p-4 shadow-sm">
-                    <h4 className="mb-3">Update Details</h4>
+                <div className="glass-panel p-5">
+                    <h5 className="mb-4 text-white border-bottom border-secondary border-opacity-50 pb-2">Account Details</h5>
                     <form onSubmit={handleProfileUpdate}>
-                        <div className="mb-3">
-                            <label className="form-label">Username (Immutable)</label>
+                        <div className="mb-4">
+                            <label className="form-label text-secondary fw-semibold">Username (Immutable)</label>
                             <input 
                                 type="text" 
-                                className="form-control" 
+                                className="form-control premium-input opacity-75" 
                                 value={user?.username || localStorage.getItem("username")} 
                                 disabled 
                             />
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="displayName" className="form-label">Display Name</label>
+                        <div className="mb-4">
+                            <label htmlFor="displayName" className="form-label text-secondary fw-semibold">Display Name</label>
                             <input
                                 type="text"
-                                className="form-control"
+                                className="form-control premium-input"
                                 id="displayName"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
@@ -142,8 +191,12 @@ const Profile = ({ user, setUser }) => {
                             />
                         </div>
 
-                        <button className="btn btn-success w-100" type="submit">
-                            Save Changes
+                        <button className="btn-premium w-100 mt-3" type="submit" disabled={isLoading}>
+                            {isLoading ? (
+                                <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...</>
+                            ) : (
+                                <>Save Changes <i className="bi bi-check-circle ms-1"></i></>
+                            )}
                         </button>
                     </form>
                 </div>

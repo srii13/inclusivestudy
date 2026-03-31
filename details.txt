@@ -1,0 +1,68 @@
+==============================================================
+               ONLINE STUDY ROOM (VERSION 1.0)
+==============================================================
+An immersive, gamified, and real-time collaborative platform 
+designed to maximize student productivity through strictly 
+enforced focus sessions and live multiplayer utility rooms.
+
+=========================
+    THE TECH STACK
+=========================
+Frontend (Client Application):
+- Core: React 19 (via Vite 7), Javascript (ES Modules)
+- Routing: React Router DOM v6
+- State Management: React Context API (Pomodoro Context)
+- Networking: Axios, Socket.io-Client v4
+- UI / Styling: Bootstrap 5, Custom Vanilla CSS (Glassmorphism, gradients, animations)
+- External Libraries: @excalidraw/excalidraw (Web-native collaborative whiteboard canvas)
+
+Backend (Server / API Platform):
+- Core Framework: Node.js, Express 5
+- Database Layer: MongoDB Native, Mongoose v8 ORM schemas
+- Real-time Communication: Socket.io v4 (WebSockets)
+- Authentication/Security: JSON Web Tokens (JWT), bcrypt (Password hashing), CORS
+- Utility/Middleware: Multer 2.0 (Handling 'multipart/form-data' local file uploads), Nanoid (Fast unique room/poll IDs)
+
+=========================
+    CORE FEATURES
+=========================
+
+1. Authentication & User Profile Layer
+   - Users can securely register and log in to the application utilizing JWT Bearer tokens.
+   - Passwords are salted and irreversibly hashed before touching the MongoDB via bcrypt.
+   - Profiles support customizable Display Names and Avatar image URLs.
+
+2. Real-Time Collaborative Study Rooms
+   - Users can create unique, sharable rooms or discover public, active sessions straight from the dynamic Dashboard.
+   - Persistent Presence Tracking: Socket.io enforces live "user joined/left" events. 
+   - Instant Messaging / Announcements: Active socket events for basic chat interactions.
+   - Shared Notes Toolkit: A centrally synchronized text playground allowing multiple users to jot down quick notes together.
+   - Collaborative Whiteboards: Embedded Excalidraw instances that broadcast vector drawing data (lines, shapes, text entries) to all room participants seamlessly.
+   - Shared Room Todos: Real-time tracked checklists for peer accountability.
+
+3. Gamified Pomodoro "Focus Mode" Mechanics
+   - A highly tailored, anti-distraction timer interface (Defaulting to 25m Focus / 5m Break).
+   - "Focus Violation Overlay": An intelligent browser listener hooked into the standard web Visibility and Fullscreen API. If a user exits fullscreen or switches to another tab (cheats), the interval pauses automatically and logs the violation.
+   - XP Gamification Engine:
+      - Sessions declare an active "Study Field" XP Goal (Math, Science, History, etc.).
+      - Validated sessions communicate back to the server to securely provision 10 XP per minute allocated.
+      - A precise 1.5x Multiplier is awarded for executing a perfect, uninterrupted Focus sprint. 
+      - The `User` database keeps a living map of XP accumulated per field and auto-calculates global RPG-style Levels per 1000 XP threshold.
+
+4. Global Leaderboard Aggregation
+   - Fetching live points from MongoDB, resolving rank based strictly on accumulated time-spent focused.
+   - Automatically processes each User's XP history to flag their dominant "Top Field".
+   - Dynamically subscribes to Socket-level `db-leaderboard-update` pings to rebuild the DOM whenever any user completes a cycle.
+
+5. Personal Knowledge Repository
+   - Fully independent backend module to ingest, store, and serve user resources using Multer.
+   - Stores documents, images, and text snippets to local `/uploads` storage dynamically.
+   - In-App Document Viewer Modal: Custom engineered `<iframe/>` and `<pre/>` logic that intercepts user clicks to present PDFs and code straight inside the platform safely, entirely circumventing the risk of the 'Focus' breaking by shifting document context natively.
+
+=========================
+    APPLICATION FLOW
+=========================
+1. Client initializes (`App.jsx`), verifying local token storage and unlocking Protected DOM trees if valid.
+2. User selects an environment. They can view Global standouts (`LeaderboardPage`), manage personal task queues (`TodoPage`), upload documents (`ResourcesPage`), or commit to actual work (`PomodoroPage` / `Dashboard`).
+3. Entering a Study Room binds a massive array of concurrent listeners (`socket.on`), downloading the latest whiteboard array payload and shared todos via the active node.js server-memory architecture cache.
+4. Starting a Solo Session locks down the device context to strictly enforce the user goals via the `PomodoroContext` provider hierarchy.

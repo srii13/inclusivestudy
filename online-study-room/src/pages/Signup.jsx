@@ -50,53 +50,53 @@ const Signup = () => {
             {/* Navbar is optional on signup, but keeping it for consistency */}
             <Navbar user={null} setUser={() => {}} /> 
             
-            <div className="d-flex vh-100 justify-content-center align-items-center bg-light">
-                <div className="card p-4 shadow" style={{ width: "400px" }}>
-                    <h3 className="mb-3 text-center">Create Account</h3>
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 'calc(100vh - 100px)' }}>
+                <div className="glass-panel p-5" style={{ width: "450px", marginTop: "2rem", marginBottom: "2rem" }}>
+                    <h3 className="mb-4 text-center fw-bold text-white">Join <span className="text-gradient">StudyRoom</span></h3>
                     
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    {success && <div className="alert alert-success">{success}</div>}
+                    {error && <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-danger border-opacity-50">{error}</div>}
+                    {success && <div className="alert alert-success bg-success bg-opacity-25 text-success border-success border-opacity-50">{success}</div>}
                     
                     <form onSubmit={handleSignup}>
-                        <div className="mb-3">
-                            <label className="form-label">Username</label>
+                        <div className="mb-4">
+                            <label className="form-label text-secondary fw-semibold">Username</label>
                             <input
                                 type="text"
-                                className="form-control"
+                                className="form-control premium-input"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
                             />
                         </div>
                         
-                        <div className="mb-3">
-                            <label className="form-label">Display Name (Optional)</label>
+                        <div className="mb-4">
+                            <label className="form-label text-secondary fw-semibold">Display Name (Optional)</label>
                             <input
                                 type="text"
-                                className="form-control"
+                                className="form-control premium-input"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                                 placeholder="Your name for the rooms"
                             />
                         </div>
 
-                        <div className="mb-3">
-                            <label className="form-label">Password</label>
+                        <div className="mb-4">
+                            <label className="form-label text-secondary fw-semibold">Password</label>
                             <input
                                 type="password"
-                                className="form-control"
+                                className="form-control premium-input"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                         </div>
 
-                        <button className="btn btn-primary w-100" type="submit" disabled={!!success}>
-                            Sign Up
+                        <button className="btn-premium w-100 mt-2" type="submit" disabled={!!success}>
+                            Create Account <i className="bi bi-person-plus ms-1"></i>
                         </button>
                     </form>
-                    <p className="mt-3 text-center text-muted">
-                        Already have an account? <Link to="/login">Login</Link>
+                    <p className="mt-4 text-center text-secondary">
+                        Already have an account? <Link to="/login" className="text-decoration-none fw-bold text-gradient">Login</Link>
                     </p>
                 </div>
             </div>

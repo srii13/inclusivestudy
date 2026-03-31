@@ -43,50 +43,49 @@ const RoomTodoList = ({ socket, roomId, displayName }) => {
     };
 
     return (
-        <div className="card p-3 shadow-sm" style={{ border: 'none' }}>
-            <h5 className="text-center mb-3">
-                <i className="bi bi-list-check me-2"></i> Shared To-Dos
+        <div className="glass-panel border-0 p-3">
+            <h5 className="text-center text-white fw-bold mb-3">
+                <i className="bi bi-list-check me-2 text-gradient"></i> Shared To-Dos
             </h5>
             
             {/* Input Field */}
-            <div className="d-flex mb-3" onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}>
+            <div className="d-flex mb-3 gap-2" onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}>
                 <input
                     type="text"
-                    className="form-control me-2 form-control-sm"
+                    className="form-control form-control-sm premium-input"
                     placeholder="Add collaborative task..."
                     value={newTodoText}
                     onChange={(e) => setNewTodoText(e.target.value)}
                 />
-                <button className="btn btn-primary btn-sm" onClick={handleAddTodo}
-                    style={{ backgroundColor: '#4903fc', borderColor: '#4903fc' }}>
+                <button className="btn-premium btn-sm px-3 flex-shrink-0" onClick={handleAddTodo}>
                     Add
                 </button>
             </div>
 
             {/* List */}
-            <div className="list-group list-group-flush" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+            <div className="list-group list-group-flush rounded-3 border border-secondary border-opacity-50" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                 {todos.map((todo) => (
                     <div 
                         key={todo.id} 
-                        className="list-group-item d-flex justify-content-between align-items-center"
-                        style={{ padding: '0.5rem 0.25rem' }}
+                        className="list-group-item d-flex justify-content-between align-items-center bg-dark bg-opacity-50 border-secondary border-opacity-50"
+                        style={{ padding: '0.6rem 0.5rem' }}
                     >
                         <div className="d-flex align-items-center">
                             <input 
                                 type="checkbox" 
-                                className="form-check-input me-2" 
+                                className="form-check-input me-2 border-secondary border-opacity-50 shadow-sm cursor-pointer" 
                                 checked={todo.done} 
                                 onChange={() => handleToggle(todo.id)} 
                             />
-                            <span className={todo.done ? "text-decoration-line-through text-muted small" : "text-dark small"}>
+                            <span className={todo.done ? "text-decoration-line-through text-secondary small" : "text-white small"}>
                                 {todo.text}
                             </span>
                         </div>
-                        <small className="badge bg-secondary-subtle text-secondary">{todo.creator}</small>
+                        <small className="badge bg-secondary bg-opacity-25 text-white">{todo.creator}</small>
                     </div>
                 ))}
             </div>
-            {!todos.length && <p className="text-center text-muted small mt-2">No shared tasks yet.</p>}
+            {!todos.length && <p className="text-center text-secondary small mt-3">No shared tasks yet.</p>}
         </div>
     );
 };

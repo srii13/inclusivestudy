@@ -13,10 +13,11 @@ const Navbar = ({ user, setUser }) => {
     
     // Check if the user is logged in
     const isLoggedIn = user?.displayName || localStorage.getItem("displayName");
+    const avatar = user?.avatar || localStorage.getItem("avatar");
 
     return (
-        // Use a slightly softer dark background and add a subtle bottom border/shadow
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg border-bottom border-secondary">
+        // Premium floating glass navbar with high z-index to prevent dropdown clipping
+        <nav className="navbar navbar-expand-lg navbar-dark glass-panel mx-4 mt-4 mb-2 shadow-lg border-0 position-relative" style={{ borderRadius: '20px', zIndex: 1050 }}>
             <div className="container-fluid mx-4">
                 {/* 1. BRANDING: Clearer, more impactful logo */}
                 <Link to="/dashboard" className="navbar-brand d-flex align-items-center fw-bold fs-5">
@@ -43,29 +44,33 @@ const Navbar = ({ user, setUser }) => {
                     {/* 3. PROFILE DROPDOWN: Prominent and well-defined */}
                     <div className="dropdown d-inline-block">
                         <button
-                            className={`btn btn-sm ${isLoggedIn ? 'btn-warning text-dark' : 'btn-secondary'} dropdown-toggle d-flex align-items-center shadow-sm`}
+                            className={`btn btn-sm ${isLoggedIn ? 'btn-premium' : 'btn-secondary'} dropdown-toggle d-flex align-items-center shadow-sm rounded-pill px-3 py-1`}
                             type="button"
                             id="profileMenu"
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
+                            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
                         >
-                            <i className="bi bi-person-circle me-2 fs-5"></i>
-                            <span className="d-none d-md-inline">{isLoggedIn || "Guest"}</span>
+                            {isLoggedIn && avatar ? (
+                                <img src={avatar.includes('http') ? avatar : `http://localhost:3001${avatar}`} alt="Avatar" className="rounded-circle me-2 object-fit-cover shadow-sm bg-dark" style={{ width: '24px', height: '24px' }} onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='inline-block'}} />
+                            ) : null}
+                            <i className="bi bi-person-circle me-2 fs-5" style={{ display: (isLoggedIn && avatar) ? 'none' : 'inline-block' }}></i>
+                            <span className="d-none d-md-inline fw-bold">{isLoggedIn || "Guest"}</span>
                         </button>
-                        <ul className="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="profileMenu">
+                        <ul className="dropdown-menu dropdown-menu-end shadow-lg dropdown-menu-dark glass-panel border border-secondary border-opacity-50 mt-2 p-2 rounded-4" aria-labelledby="profileMenu" style={{ minWidth: '220px' }}>
                             {isLoggedIn ? (
                                 <>
-                                    <li><span className="dropdown-item-text text-muted small border-bottom mb-2 pb-2">Logged in as: {isLoggedIn}</span></li>
-                                    <li><Link className="dropdown-item" to="/profile"><i className="bi bi-gear me-2"></i> Profile Settings</Link></li>
-                                    <li><hr className="dropdown-divider" /></li>
+                                    <li><span className="dropdown-item-text text-secondary small border-bottom border-secondary border-opacity-50 mb-2 pb-2 fw-bold d-block">Logged in as: <span className="text-white">{isLoggedIn}</span></span></li>
+                                    <li><Link className="dropdown-item text-white rounded-3 mb-1" to="/profile"><i className="bi bi-gear me-2 text-primary"></i> Profile Settings</Link></li>
+                                    <li><hr className="dropdown-divider border-secondary border-opacity-50" /></li>
                                     <li>
-                                        <button className="dropdown-item text-danger" onClick={handleLogout}>
+                                        <button className="dropdown-item text-danger rounded-3 fw-bold" onClick={handleLogout}>
                                             <i className="bi bi-box-arrow-right me-2"></i> Logout
                                         </button>
                                     </li>
                                 </>
                             ) : (
-                                <li><Link className="dropdown-item text-success fw-bold" to="/login"><i className="bi bi-box-arrow-in-right me-2"></i> Login / Sign Up</Link></li>
+                                <li><Link className="dropdown-item text-success fw-bold rounded-3" to="/login"><i className="bi bi-box-arrow-in-right me-2"></i> Login / Sign Up</Link></li>
                             )}
                         </ul>
                     </div>

@@ -11,14 +11,22 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import PomodoroPage from "./pages/PomodoroPage";
 import TodoPage from "./pages/TodoPage";
 import ResourcesPage from "./pages/ResourcesPage";
+import { PomodoroProvider } from "./context/PomodoroContext";
+import FloatingPomodoro from "./components/FloatingPomodoro";
+import AmbientPlayer from "./components/AmbientPlayer";
+import FocusViolationOverlay from "./components/FocusViolationOverlay";
 
 function App() {
   const [user, setUser] = useState(null);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+    <PomodoroProvider>
+      <Router>
+        <FocusViolationOverlay />
+        <FloatingPomodoro />
+        <AmbientPlayer />
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
@@ -30,7 +38,8 @@ function App() {
         <Route path="/todo" element={<TodoPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
       </Routes>
-    </Router>
+      </Router>
+    </PomodoroProvider>
   );
 }
 

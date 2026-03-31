@@ -78,71 +78,73 @@ const Dashboard = ({ user, setUser }) => {
       <div className="container mt-5">
         
         {/* POLISHED WELCOME BANNER */}
-        <div className="text-center mb-5 p-4 bg-light rounded-4 shadow-lg border-bottom border-warning border-3">
-            <h1 className="display-5 mb-3 fw-bold text-dark">
-                Welcome, {user?.displayName || "Study Hero"}! 
+        <div className="text-center mb-5 p-5 glass-panel border-0">
+            <h1 className="display-4 mb-3 fw-bolder text-white">
+                Welcome, <span className="text-gradient">{user?.displayName || "Study Hero"}</span>! 
             </h1>
-            <p className="lead text-muted mb-4"> 
+            <p className="lead text-secondary mb-4"> 
                 Find your focus. Join a session, or start a new collaborative room.
             </p>
 
-            {/* 3. MOTIVATIONAL QUOTE BOX */}
+            {/* MOTIVATIONAL QUOTE BOX */}
             <div 
-                className={`mx-auto p-3 text-center border-start border-primary border-4 bg-white shadow-sm quote-box ${isFading ? 'fade-out' : 'fade-in'}`}
-                style={{ maxWidth: '600px', minHeight: '80px', transition: 'opacity 0.5s ease-in-out' }}
+                className={`mx-auto p-4 text-center glass-panel border-0 shadow-none quote-box ${isFading ? 'fade-out' : 'fade-in'}`}
+                style={{ maxWidth: '700px', minHeight: '100px', transition: 'opacity 0.5s ease-in-out', background: 'rgba(0,0,0,0.2)' }}
             >
-                <p className="mb-1 fw-medium text-dark fst-italic">
+                <p className="mb-2 fs-5 fw-medium text-white fst-italic" style={{ letterSpacing: '0.3px' }}>
                     "{currentQuote.text}"
                 </p>
-                <footer className="blockquote-footer mt-1">
-                    {currentQuote.author}
+                <footer className="mt-2 text-secondary fw-semibold">
+                    — {currentQuote.author}
                 </footer>
             </div>
             {/* END QUOTE BOX */}
 
         </div>
 
-        <h2 className="mb-4 border-bottom pb-2">Active Study Sessions</h2>
+        <div className="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <i className="bi bi-broadcast fs-3 me-3 text-gradient"></i>
+            <h2 className="mb-0 text-white fw-bold">Active Study Sessions</h2>
+        </div>
         
         {loading && <div className="text-center p-5"><i className="bi bi-arrow-clockwise spin me-2"></i> Loading rooms...</div>}
         {error && <div className="alert alert-danger">{error}</div>}
         
-        {/* ROOM LISTING GRID (unchanged) */}
-        <div className="row">
+        <div className="row g-4">
           {rooms.map((room) => (
-            <div key={room.roomId} className="col-md-6 col-lg-4 mb-4">
+            <div key={room.roomId} className="col-md-6 col-lg-4">
               <div 
-                className="card shadow-hover h-100" 
-                style={{ cursor: 'pointer', border: '1px solid #dee2e6', transition: 'box-shadow 0.2s' }}
+                className="glass-panel glass-panel-hover h-100 d-flex flex-column text-start" 
+                style={{ cursor: 'pointer', padding: '1.5rem' }}
                 onClick={() => handleJoin(room.roomId)}
               >
-                <div className="card-body d-flex flex-column">
-                  
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span className={`badge bg-primary-subtle text-primary fw-bold`}>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <span className="room-badge">
                         {room.subject}
                     </span>
-                    <span className="text-success small fw-bold">LIVE</span>
+                    <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 rounded-pill px-3 py-1">
+                        <i className="bi bi-circle-fill me-1" style={{ fontSize: '0.4rem', verticalAlign: 'middle' }}></i> LIVE
+                    </span>
                   </div>
 
-                  <h5 className="card-title mb-1">{room.name}</h5>
+                  <h4 className="text-white mb-2 fw-bold">{room.name}</h4>
                   
-                  <p className="card-text text-muted small flex-grow-1 mb-3">
-                    <i className="bi bi-person-fill me-1"></i> Host: {room.host}
+                  <p className="text-secondary small flex-grow-1 mb-4">
+                    <i className="bi bi-person-fill me-2"></i>Host: <span className="text-white">{room.host}</span>
                   </p>
                   
-                  <div className="d-flex justify-content-between align-items-center pt-2 border-top">
-                    <span className="text-dark fw-bold">
-                        <i className="bi bi-people-fill me-1"></i> {room.participantCount} Active
+                  <div className="d-flex justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25">
+                    <span className="text-white fw-semibold">
+                        <i className="bi bi-people-fill me-2 text-gradient"></i>
+                        {room.participantCount} Active
                     </span>
                     <button 
-                      className="btn btn-sm btn-success"
+                      className="btn-premium py-1 px-3"
                       onClick={(e) => { e.stopPropagation(); handleJoin(room.roomId); }}
                     >
-                      <i className="bi bi-box-arrow-in-right"></i> Join
+                      Join <i className="bi bi-arrow-right ms-1"></i>
                     </button>
                   </div>
-                </div>
               </div>
             </div>
           ))}

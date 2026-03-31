@@ -34,39 +34,39 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <div className="d-flex vh-100 justify-content-center align-items-center bg-light">
-      <div className="card p-4 shadow" style={{ width: "400px" }}>
-        <h3 className="mb-3">Login</h3>
-        {error && <div className="alert alert-danger">{error}</div>}
+    <div className="d-flex vh-100 justify-content-center align-items-center" style={{ marginTop: '-60px' }}>
+      <div className="glass-panel p-5" style={{ width: "400px" }}>
+        <h3 className="mb-4 text-center fw-bold text-white">Login to <span className="text-gradient">StudyRoom</span></h3>
+        {error && <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-danger border-opacity-50">{error}</div>}
         <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label className="form-label">Username</label>
+          <div className="mb-4">
+            <label className="form-label text-secondary fw-semibold">Username</label>
             <input
               type="text"
-              className="form-control"
+              className="form-control premium-input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
 
-          <div className="mb-3">
-            <label className="form-label">Password</label>
+          <div className="mb-4">
+            <label className="form-label text-secondary fw-semibold">Password</label>
             <input
               type="password"
-              className="form-control"
+              className="form-control premium-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          <button className="btn btn-success w-100" type="submit">
-            Login
+          <button className="btn-premium w-100 mt-2" type="submit">
+            Login <i className="bi bi-box-arrow-in-right ms-1"></i>
           </button>
         </form>
-        <p className="mt-3 text-muted">
-          Don’t have an account? <Link to="/signup">Sign Up</Link>
+        <p className="mt-4 text-center text-secondary">
+          Don’t have an account? <Link to="/signup" className="text-decoration-none fw-bold text-gradient">Sign Up</Link>
         </p>
       </div>
     </div>

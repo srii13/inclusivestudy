@@ -9,6 +9,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // Bootstrap JS (for dropdowns, modals, etc.)
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
+// Global custom styles
+import "./index.css";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
