@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-
 const API_URL = "http://localhost:3001";
 
 const Signup = () => {
@@ -46,12 +44,8 @@ const Signup = () => {
     };
 
     return (
-        <div>
-            {/* Navbar is optional on signup, but keeping it for consistency */}
-            <Navbar user={null} setUser={() => {}} /> 
-            
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 'calc(100vh - 100px)' }}>
-                <div className="glass-panel p-5" style={{ width: "450px", marginTop: "2rem", marginBottom: "2rem" }}>
+        <div className="d-flex min-vh-100 justify-content-center align-items-center py-4">
+            <div className="glass-panel p-5" style={{ width: "450px" }}>
                     <h3 className="mb-4 text-center fw-bold text-white">Join <span className="text-gradient">StudyRoom</span></h3>
                     
                     {error && <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-danger border-opacity-50">{error}</div>}
@@ -98,7 +92,6 @@ const Signup = () => {
                     <p className="mt-4 text-center text-secondary">
                         Already have an account? <Link to="/login" className="text-decoration-none fw-bold text-gradient">Login</Link>
                     </p>
-                </div>
             </div>
         </div>
     );

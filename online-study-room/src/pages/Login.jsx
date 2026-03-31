@@ -34,7 +34,7 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <div className="d-flex vh-100 justify-content-center align-items-center" style={{ marginTop: '-60px' }}>
+    <div className="d-flex min-vh-100 justify-content-center align-items-center py-4">
       <div className="glass-panel p-5" style={{ width: "400px" }}>
         <h3 className="mb-4 text-center fw-bold text-white">Login to <span className="text-gradient">StudyRoom</span></h3>
         {error && <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-danger border-opacity-50">{error}</div>}
